@@ -1,3 +1,5 @@
+import pandas as pd
+
 class Univariate():
     def quanQual(dataset):
         quan=[]
@@ -18,7 +20,8 @@ class Univariate():
             descriptive[column]["Mode"]= dataset[column].mode()[0]
         return descriptive
 
-    def measureOfLocation(descriptive,dataset, columns):
+    def measureOfLocation(dataset, columns):
+        descriptive = pd.DataFrame(index=["Q1:25%","Q2:50%","Q3:75%","Q4:100%","IQR","1.5Rule","Lesser","Greater","Min","Max"], columns=columns)
         for column in columns:
             descriptive[column]["Q1:25%"]= dataset.describe()[column]["25%"]  #np.percentile(dataset[column],25)
             descriptive[column]["Q2:50%"]= dataset.describe()[column]["50%"]  #np.percentile(dataset[column],50)
@@ -50,4 +53,14 @@ class Univariate():
         for columnName in greater:
             dataset[columnName][dataset[columnName]<descriptive[columnName]["Greater"]] = descriptive[columnName]["Greater"]
         return dataset 
+        
+    def frequencyTable(dataset, column_name):
+        freq_table = pd.DataFrame(columns=["Unique_values","Frequency","Relative_Frequency","Cusum"])
+        freq_table["Unique_values"] = dataset[column_name].value_counts().index
+        freq_table["Frequency"] = dataset[column_name].value_counts().values
+        freq_table["Relative_Frequency"] = (freq_table["Frequency"]/103)
+        freq_table["Cusum"] = freq_table["Relative_Frequency"].cumsum()
+        return freq_table
+        
+        
             
