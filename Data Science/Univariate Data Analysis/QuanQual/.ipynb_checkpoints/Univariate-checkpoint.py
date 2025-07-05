@@ -21,7 +21,8 @@ class Univariate():
         return descriptive
 
     def measureOfLocation(dataset, columns):
-        descriptive = pd.DataFrame(index=["Q1:25%","Q2:50%","Q3:75%","Q4:100%","IQR","1.5Rule","Lesser","Greater","Min","Max"], columns=columns)
+        descriptive = pd.DataFrame(index=["Q1:25%","Q2:50%","Q3:75%","Q4:100%","IQR","1.5Rule","Lesser","Greater","Min","Max",
+                                          "Kurtosis","Skew","Variance","StandeardDeviation"], columns=columns)
         for column in columns:
             descriptive[column]["Q1:25%"]= dataset.describe()[column]["25%"]  #np.percentile(dataset[column],25)
             descriptive[column]["Q2:50%"]= dataset.describe()[column]["50%"]  #np.percentile(dataset[column],50)
@@ -32,7 +33,11 @@ class Univariate():
             descriptive[column]["Lesser"]= descriptive[column]["Q1:25%"]-descriptive[column]["1.5Rule"]
             descriptive[column]["Greater"]= descriptive[column]["Q3:75%"]+descriptive[column]["1.5Rule"]
             descriptive[column]["Min"]= dataset[column].min()
-            descriptive[column]["Max"]= dataset[column].max()        
+            descriptive[column]["Max"]= dataset[column].max()   
+            descriptive[column]["Kurtosis"]= dataset[column].kurtosis()   
+            descriptive[column]["Skew"]= dataset[column].skew()
+            descriptive[column]["Variance"]= dataset[column].var()
+            descriptive[column]["StandeardDeviation"]= dataset[column].std()
         return descriptive
     def findingOutlier(descriptive, columns):
         #Finding outlier
@@ -47,11 +52,10 @@ class Univariate():
 
     def replaceTheOutlier(descriptive, dataset, lesser, greater):
         # Replace the outliner
-        for columnName in lesser:
-            dataset[columnName][dataset[columnName]<descriptive[columnName]["Lesser"]] = descriptive[columnName]["Lesser"]
-        
+        for columnName in lesser:            
+            dataset[columnName][dataset[columnName] < descriptive[columnName]["Lesser"]] = descriptive[columnName]["Lesser"]                    
         for columnName in greater:
-            dataset[columnName][dataset[columnName]<descriptive[columnName]["Greater"]] = descriptive[columnName]["Greater"]
+            dataset[columnName][dataset[columnName] > descriptive[columnName]["Greater"]] = descriptive[columnName]["Greater"]
         return dataset 
         
     def frequencyTable(dataset, column_name):
