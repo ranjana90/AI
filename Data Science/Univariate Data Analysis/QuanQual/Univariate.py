@@ -1,4 +1,6 @@
 import pandas as pd
+from sklearn.impute import SimpleImputer
+import numpy as np
 
 class Univariate():
     def quanQual(dataset):
@@ -65,6 +67,28 @@ class Univariate():
         freq_table["Relative_Frequency"] = (freq_table["Frequency"]/103)
         freq_table["Cusum"] = freq_table["Relative_Frequency"].cumsum()
         return freq_table
+
+    def CreateImputerForReplaceNan(dataset_type, dataset, column_list):
+        
+        if "Quantitative" in dataset_type:
+            strategy='mean'
+            print("Quantitative")
+        else:
+            strategy='most_frequent'
+            print(False)
+
+        # Create an imputer to replace NaN values with the mean of each column
+        imputer = SimpleImputer(missing_values=np.nan, strategy=strategy)
+        
+        # Fit the imputer and transform the data
+        imputer.fit(dataset[column_list])
+        ds = imputer.transform(dataset[column_list])
+        processed_df = pd.DataFrame(ds, columns= column_list)
+        return processed_df
         
         
-            
+    def replaceQualitativeColumn(dataset, column_names):
+        for column in column_names:
+            most_frequent = dataset[column].mode()[0]
+            dataset[column] = dataset[column].fillna(most_frequent)
+        return dataset
